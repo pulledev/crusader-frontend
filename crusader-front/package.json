@@ -37,7 +37,8 @@
 		"tailwindcss": "^4.1.14",
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.44.1",
-		"vite": "^7.1.7"
+		"vite": "^7.1.7",
+		"vite-plugin-full-reload": "^1.2.0"
 	},
 	"dependencies": {
 		"bits-ui": "^2.11.5"

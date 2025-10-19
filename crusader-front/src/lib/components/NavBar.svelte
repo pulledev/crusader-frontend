@@ -75,7 +75,7 @@
             <NavigationMenu.Trigger
                     class="hover:text-accent-foreground focus-visible:bg-muted focus-visible:text-accent-foreground data-[state=open]:shadow-mini dark:hover:bg-muted dark:data-[state=open]:bg-muted focus-visible:outline-hidden group inline-flex h-8 w-max items-center justify-center rounded-[7px] bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-white"
             >
-                Getting started
+                Member
                 <CaretDown
                         class="relative top-[1px] ml-1 size-3 transition-transform duration-200 group-data-[state=open]:rotate-180"
                         aria-hidden="true"
@@ -90,12 +90,17 @@
                     <li class="row-span-3 mb-2 sm:mb-0">
                         <NavigationMenu.Link
                                 href="/"
-                                class="from-muted/50 to-muted bg-linear-to-b outline-hidden flex h-full w-full select-none flex-col justify-end rounded-md p-6 no-underline focus:shadow-md"
+                                class="from-muted/50 to-muted bg-linear-to-b outline-hidden flex h-full w-full select-none flex-col justify-end rounded-md p-6 no-underline focus:shadow-md transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:scale-[0.98] hover:shadow-inner hover:brightness-98"
+                                style="background-image: url('/backgroun_dashboard.png');
+                                background-size: cover;
+                                background-position: center;
+                                background-repeat: no-repeat;
+                                "
                         >
                             <!-- <Icons.logo class="h-6 w-6" /> -->
-                            <div class="mb-2 mt-4 text-lg font-medium">Bits UI</div>
+                            <div class="mb-2 mt-4 text-lg font-medium">Dashboard</div>
                             <p class="text-muted-foreground text-sm leading-tight">
-                                The headless components for Svelte.
+                                Ränge, Ausbildungen & vieles mehr
                             </p>
                         </NavigationMenu.Link>
                     </li>
