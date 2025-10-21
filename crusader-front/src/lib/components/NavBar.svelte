@@ -6,39 +6,27 @@
 
     const components: { title: string; href: string; description: string }[] = [
         {
-            title: "Alert Dialog",
-            href: "/docs/components/alert-dialog",
-            description:
-                "A modal dialog that interrupts the user with important content and expects a response."
-        },
-        {
-            title: "Link Preview",
-            href: "/docs/components/link-preview",
-            description:
-                "For sighted users to preview content available behind a link."
-        },
-        {
-            title: "Progress",
+            title: "Personalakten",
             href: "/docs/components/progress",
             description:
-                "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar."
+                "Liste mit allen Mitgliedern"
         },
         {
-            title: "Scroll Area",
+            title: "Bewerbungsboard",
+            href: "/docs/components/alert-dialog",
+            description:
+                "Ansicht aller neuer Bewerbungen"
+        },
+        {
+            title: "Eventmanager",
+            href: "/docs/components/link-preview",
+            description:
+                "Nachbereitung und Anzeige von Events"
+        },
+        {
+            title: "Ausbildungsmanager",
             href: "/docs/components/scroll-area",
-            description: "Visually or semantically separates content."
-        },
-        {
-            title: "Tabs",
-            href: "/docs/components/tabs",
-            description:
-                "A set of layered sections of content—known as tab panels—that are displayed one at a time."
-        },
-        {
-            title: "Tooltip",
-            href: "/docs/components/tooltip",
-            description:
-                "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it."
+            description: "Nachbereitung und Anzeige von Ausbildungen"
         }
     ];
 
@@ -75,7 +63,8 @@
             <NavigationMenu.Trigger
                     class="hover:text-accent-foreground focus-visible:bg-muted focus-visible:text-accent-foreground data-[state=open]:shadow-mini dark:hover:bg-muted dark:data-[state=open]:bg-muted focus-visible:outline-hidden group inline-flex h-8 w-max items-center justify-center rounded-[7px] bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-white"
             >
-                Member
+                <span class="hidden sm:inline"> Mitglieds Bereich </span>
+                <span class="inline sm:hidden"> Mitglied </span>
                 <CaretDown
                         class="relative top-[1px] ml-1 size-3 transition-transform duration-200 group-data-[state=open]:rotate-180"
                         aria-hidden="true"
@@ -89,7 +78,7 @@
                 >
                     <li class="row-span-3 mb-2 sm:mb-0">
                         <NavigationMenu.Link
-                                href="/"
+                                href="/dashboard/123456789"
                                 class="from-muted/50 to-muted bg-linear-to-b outline-hidden flex h-full w-full select-none flex-col justify-end rounded-md p-6 no-underline focus:shadow-md transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] brightness-103 hover:shadow-inner hover:brightness-94"
                                 style="background-image: url('/backgroun_dashboard.png');
                                 background-size: cover;
@@ -107,18 +96,18 @@
 
                     {@render ListItem({
                         href: "/docs",
-                        title: "Introduction",
-                        content: "Headless components for Svelte and SvelteKit"
+                        title: "Ausbildungen",
+                        content: "Ausbildungskatalog und dein Fortschritt"
                     })}
                     {@render ListItem({
                         href: "/docs/getting-started",
-                        title: "Getting Started",
-                        content: "How to install and use Bits UI"
+                        title: "Dein Element",
+                        content: "Mitlgieder und Rollen in Alpha"
                     })}
                     {@render ListItem({
                         href: "/docs/styling",
-                        title: "Styling",
-                        content: "How to style Bits UI components"
+                        title: "Events & Ausbildungen",
+                        content: "Informationen über alle Events und Ausbildungen"
                     })}
                 </ul>
             </NavigationMenu.Content>
@@ -127,7 +116,8 @@
             <NavigationMenu.Trigger
                     class="hover:text-accent-foreground focus-visible:bg-muted focus-visible:text-accent-foreground data-[state=open]:shadow-mini dark:hover:bg-muted dark:data-[state=open]:bg-muted focus-visible:outline-hidden group inline-flex h-8 w-max items-center justify-center rounded-[7px] bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-white"
             >
-                Components
+                <span class="hidden sm:inline"> Stabs Bereich </span>
+                <span class="inline sm:hidden"> Stab </span>
                 <CaretDown
                         class="relative top-[1px] ml-1 size-3 transition-transform duration-200 group-data-[state=open]:rotate-180"
                         aria-hidden="true"
@@ -154,8 +144,8 @@
                     class="hover:text-accent-foreground focus:bg-muted focus:text-accent-foreground data-[state=open]:shadow-mini dark:hover:bg-muted dark:data-[state=open]:bg-muted focus:outline-hidden group inline-flex h-8 w-max items-center justify-center rounded-[7px] bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-white disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-white"
                     href="/docs"
             >
-                <span class="hidden sm:inline"> Documentation </span>
-                <span class="inline sm:hidden"> Docs </span>
+                <span class="hidden sm:inline"> Administrator Dashboard </span>
+                <span class="inline sm:hidden"> Admin Dashboard </span>
             </NavigationMenu.Link>
         </NavigationMenu.Item>
         <NavigationMenu.Item>
