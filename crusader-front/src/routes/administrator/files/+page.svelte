@@ -2,13 +2,32 @@
     import UserTable from "$lib/components/UserTable.svelte";
     import { Tooltip } from "bits-ui";
     import QuestionMark from "phosphor-svelte/lib/Question";
+    import HelperAccordion from "$lib/components/HelperAccordion.svelte";
+    import MouseRightClick from "phosphor-svelte/lib/MouseRightClick";
 
     // Demo-Daten – in echt aus load() oder API
     const users = [
-        { name: "Mia", rang: "Mod",   element: "Echo",  punkte: 420,  steamId: "123456789", discordId: "1234567890" },
-        { name: "Dan", rang: "Admin", element: "Alpha", punkte: 1337, steamId: "987654321", discordId: "0987654321" },
-        { name: "Paul", rang: "Admin", element: "Alpha", punkte: 69, steamId: "112233445", discordId: "4206942069" },
-        { name: "Pulle", rang: "Admin", element: "Alpha", punkte: 69, steamId: "123", discordId: "4206942069" },
+        { name: "Mia", rang: "OFw.",   element: "Echo",  punkte: 420,  steamId: "123456789", discordId: "1234567890" },
+        { name: "Dan", rang: "Hptm.", element: "Alpha", punkte: 1337, steamId: "987654321", discordId: "0987654321" },
+        { name: "Paul", rang: "OFw.", element: "Alpha", punkte: 69, steamId: "112233445", discordId: "4206942069" },
+        { name: "Pulle", rang: "OFw.", element: "Alpha", punkte: 69, steamId: "123", discordId: "4206942069" },
+
+    ];
+
+    const documentation = [
+        {
+            title: "Wie öffne ich eine Personalakte?",
+            content: "Drücke mit der rechten Maustaste auf ein Tabelleneintrag und wähle Akte öffnen aus"
+
+        },
+        {
+            title: "Wie bearbeitet man Mitglieder?",
+            content: "Drücke mit der rechten Maustaste auf eine Tabelleneintrag und wähle Bearbeiten aus"
+        },
+        {
+            title: "Wie lösche ich Mitglieder?",
+            content: "Drücke mit der rechten Maustaste auf eine Tabelleneintrag und wähle Löschen aus"
+        }
 
     ];
 
@@ -63,6 +82,7 @@
                             <Tooltip.Trigger
                                     class="border-border-input bg-background-alt shadow-btn ring-dark ring-offset-background
 		hover:bg-muted focus-visible:ring-dark focus-visible:ring-offset-background focus-visible:outline-hidden inline-flex size-10 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:ring-offset-2"
+                                    onclick={() => document.getElementById('documentation-section')?.scrollIntoView({ behavior: 'smooth' })}
                             >
                                 <QuestionMark class="size-5" />
                             </Tooltip.Trigger>
@@ -85,15 +105,7 @@
             <div class="mt-4 flex flex-wrap items-center gap-2">
 				<span class="inline-flex items-center gap-2 rounded-lg bg-white px-2.5 py-1 text-xs text-slate-600 ring-1 ring-slate-200 dark:bg-zinc-900 dark:text-zinc-300 dark:ring-zinc-800">
 					<span class="size-1.5 rounded-full bg-emerald-400/90"></span>
-                    {total} Einträge
-				</span>
-                <span class="inline-flex items-center gap-2 rounded-lg bg-white px-2.5 py-1 text-xs text-slate-600 ring-1 ring-slate-200 dark:bg-zinc-900 dark:text-zinc-300 dark:ring-zinc-800">
-					<span class="size-1.5 rounded-full bg-sky-400/90"></span>
-                    {uniqueRanks} Ränge
-				</span>
-                <span class="inline-flex items-center gap-2 rounded-lg bg-white px-2.5 py-1 text-xs text-slate-600 ring-1 ring-slate-200 dark:bg-zinc-900 dark:text-zinc-300 dark:ring-zinc-800">
-					<span class="size-1.5 rounded-full bg-amber-400/90"></span>
-                    {uniqueElements} Elemente
+                    Insegsamt {total} Mitglieder
 				</span>
             </div>
         </header>
@@ -103,6 +115,20 @@
                 class="rounded-2xl border border-slate-200 bg-white/10 p-2 sm:p-3 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/60"
         >
             <UserTable {users} />
+        </section>
+
+        <!-- Documentation Section -->
+        <section id="documentation-section" class="mt-8 sm:mt-10">
+            <h2 class="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+                Dokumentation & Hilfe
+            </h2>
+            <div class="rounded-2xl border border-slate-200 bg-white/10 p-4 sm:p-6 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/60">
+                <HelperAccordion
+                        items={documentation}
+                        type="multiple"
+                        collapsible={false}
+                />
+            </div>
         </section>
     </main>
 </div>
