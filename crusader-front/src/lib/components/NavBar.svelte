@@ -7,7 +7,7 @@
     const components: { title: string; href: string; description: string }[] = [
         {
             title: "Personalakten",
-            href: "/docs/components/progress",
+            href: "/administrator/files",
             description:
                 "Liste mit allen Mitgliedern"
         },
@@ -19,7 +19,7 @@
         },
         {
             title: "Eventmanager",
-            href: "/docs/components/link-preview",
+            href: "/administrator/events",
             description:
                 "Nachbereitung und Anzeige von Events"
         },
