@@ -1,13 +1,16 @@
 package main
 
 import (
+	"backend/api"
+	"backend/initializers"
+	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/oapi-codegen/oapi-codegen/v2/examples/minimal-server/stdhttp/api"
+	"os"
 )
 
 func main() {
+	initializers.LoadEnvVars()
 	// create a type that satisfies the `api.ServerInterface`, which contains an implementation of every operation from the generated code
 	server := api.NewServer()
 
@@ -20,6 +23,8 @@ func main() {
 		Handler: h,
 		Addr:    "0.0.0.0:8080",
 	}
+
+	fmt.Println(os.Getenv("STRIPE_API_KEY"))
 
 	// And we serve HTTP until the world ends.
 	log.Fatal(s.ListenAndServe())
