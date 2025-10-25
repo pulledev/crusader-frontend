@@ -3,7 +3,7 @@
 
     export type AccordionItem = {
         title: string;
-        content: string; // wenn du HTML willst: unten {@html} kommentieren
+        content: string;
     };
 
     // Props
@@ -17,10 +17,9 @@
         collapsible?: boolean;
     }>();
 
-    // Kontrollierter/unkontrollierter Zustand – funktioniert für single & multiple
+
     let value = $state<string | string[] | null>(type === "single" ? null : []);
 
-    // Falls sich der Typ ändert, Zustand zurücksetzen
     $effect(() => {
         value = type === "single" ? null : [];
     });

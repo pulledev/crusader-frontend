@@ -7,10 +7,10 @@
 
     // Demo-Daten – in echt aus load() oder API
     const users = [
-        { name: "Mia", rang: "OFw.",   element: "Echo",  punkte: 420,  steamId: "123456789", discordId: "1234567890" },
-        { name: "Dan", rang: "Hptm.", element: "Alpha", punkte: 1337, steamId: "987654321", discordId: "0987654321" },
-        { name: "Paul", rang: "OFw.", element: "Alpha", punkte: 69, steamId: "112233445", discordId: "4206942069" },
-        { name: "Pulle", rang: "OFw.", element: "Alpha", punkte: 69, steamId: "123", discordId: "4206942069" },
+        { name: "Mia", rang: "OFw.",   element: "Echo",  punkte: 420,  steamId: "123456789", discordId: "1234567890", mitgliedstyp: "Mitglied" as const },
+        { name: "Dan", rang: "Hptm.", element: "Alpha", punkte: 1337, steamId: "987654321", discordId: "0987654321", mitgliedstyp: "Mitglied" as const },
+        { name: "Paul", rang: "OFw.", element: "Alpha", punkte: 69, steamId: "112233445", discordId: "4206942069", mitgliedstyp: "Freund" as const },
+        { name: "Pulle", rang: "OFw.", element: "Alpha", punkte: 69, steamId: "123", discordId: "4206942069", mitgliedstyp: "Inaktiv" as const },
 
     ];
 

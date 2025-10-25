@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ContextMenu } from "bits-ui";
+    import { goto } from "$app/navigation";
     import Mouse from "phosphor-svelte/lib/Mouse";
     import Edit from "phosphor-svelte/lib/PencilSimple";
     import Delete from "phosphor-svelte/lib/Trash";
@@ -11,6 +12,7 @@
         punkte: number;
         steamId: string;
         discordId: string;
+        mitgliedstyp: "Mitglied" | "Inaktiv" | "Freund";
     };
 
     const { users = [] as User[] } = $props<{ users?: User[] }>();
@@ -18,6 +20,7 @@
     let search = $state("");
     let filterRang = $state<string>("alle");
     let filterElement = $state<string>("alle");
+    let showOnlyActive = $state(false);
     let pageSize = $state(10);
     let page = $state(1);
 
@@ -63,12 +66,13 @@
         return users.filter((u) => {
             const matchSearch =
                 !q ||
-                [u.name, u.rang, u.element, u.punkte, u.steamId, u.discordId]
+                [u.name, u.rang, u.element, u.punkte, u.steamId, u.discordId, u.mitgliedstyp]
                     .map((v) => normalized(v))
                     .some((s) => s.includes(q));
             const matchRang = filterRang === "alle" || u.rang === filterRang;
             const matchElement = filterElement === "alle" || u.element === filterElement;
-            return matchSearch && matchRang && matchElement;
+            const matchActive = !showOnlyActive || (u.mitgliedstyp === "Mitglied");
+            return matchSearch && matchRang && matchElement && matchActive;
         });
     });
 
@@ -95,7 +99,7 @@
     });
 
     function openAkte(u: User) {
-        alert(`Akte öffnen für ${u.name} (Steam: ${u.steamId})`);
+        goto(`/administrator/files/${u.steamId}`);
     }
     function editUser(u: User) {
         alert(`Bearbeiten: ${u.name}`);
@@ -134,6 +138,15 @@
             {/if}
         </div>
 
+        <!-- Nur Aktive Checkbox -->
+        <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-zinc-300 cursor-pointer">
+            <input
+                    type="checkbox"
+                    bind:checked={showOnlyActive}
+                    class="size-4 rounded border-gray-300 text-slate-900 focus:ring-2 focus:ring-slate-400 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:ring-zinc-500"
+            />
+            <span>Nur Aktive</span>
+        </label>
     </div>
     <div class="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
         <div class="text-sm text-gray-500 dark:text-zinc-400 absolut"> {total} Einträge </div>
@@ -148,6 +161,7 @@
                 { key: "name", label: "Name" },
                 { key: "rang", label: "Rang" },
                 { key: "element", label: "Element" },
+                { key: "mitgliedstyp", label: "Mitgliedstyp" },
                 { key: "punkte", label: "Punkte" },
                 { key: "steamId", label: "SteamId" },
                 { key: "discordId", label: "DiscordId" }
@@ -173,7 +187,7 @@
         <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
         {#if pageSlice.length === 0}
             <tr>
-                <td colspan="6" class="px-4 py-10 text-center text-gray-500 dark:text-zinc-400">
+                <td colspan="7" class="px-4 py-10 text-center text-gray-500 dark:text-zinc-400">
                     Keine Treffer.
                 </td>
             </tr>
@@ -186,6 +200,14 @@
                                 <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{u.name}</td>
                                 <td class="px-4 py-3">{u.rang}</td>
                                 <td class="px-4 py-3">{u.element}</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium
+                                        {u.mitgliedstyp === 'Mitglied' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                                         u.mitgliedstyp === 'Freund' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                         'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400'}">
+                                        {u.mitgliedstyp}
+                                    </span>
+                                </td>
                                 <td class="px-4 py-3 tabular-nums">{u.punkte}</td>
                                 <td class="px-4 py-3 font-mono text-xs">{u.steamId}</td>
                                 <td class="px-4 py-3 font-mono text-xs">{u.discordId}</td>
