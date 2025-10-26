@@ -2,6 +2,7 @@ package initializers
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -21,11 +22,19 @@ func LoadEnvVars() {
 	// Loop through the file and read each line
 	for scanner.Scan() {
 		line := scanner.Text() // Get the line as a string
+
 		data := strings.Split(line, "=")
-		err := os.Setenv(data[0], data[1])
+		var temp string
+		if len(data) < 2 {
+			temp = data[0]
+			data = append(data[:0], data[:1]...)
+		}
+		err := os.Setenv(temp, strings.Join(data, ""))
 		if err != nil {
 			log.Fatalf("failed to set env var: %s", err)
 			return
 		}
+
+		fmt.Println(os.Getenv(temp))
 	}
 }

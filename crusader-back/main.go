@@ -11,6 +11,8 @@ import (
 
 func main() {
 	initializers.LoadEnvVars()
+	db := initializers.GetDB()
+
 	// create a type that satisfies the `api.ServerInterface`, which contains an implementation of every operation from the generated code
 	server := api.NewServer()
 
