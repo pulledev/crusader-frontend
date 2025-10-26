@@ -1,6 +1,6 @@
 # Crusader Backend
 ### Abstract
-Das Crusader Backend ist der Versuch, verschiedene Prozesse der Kommandokräfte Crusader zu etablieren, bestehende zu automatisieren und durch ein Datenbanksystem eine Redundanz-arme und Inkonsistenz-freie Speicherung zu umzusetzen. 
+Das Crusader Backend ist der Versuch, verschiedene Prozesse zu etablieren, bestehende zu automatisieren und durch ein Datenbanksystem eine Redundanz-arme und Inkonsistenz-freie Speicherung umzusetzen. 
 
 ## Tech-Stack aka the nerdy Part
 
@@ -16,7 +16,7 @@ Das Crusader Backend ist der Versuch, verschiedene Prozesse der Kommandokräfte 
  - Svelte 5, Svelte-Kit + TS
  - TailwindCSS, Bits-UI, Phosphor Icons
  - OpenAPI, SSO Discord
- - CRUD-Operations
+ - für CRUD-Operations mit cooler Datenvisualisierung
  - LLM Usage ist erlaubt
 
 ### Backend
