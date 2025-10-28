@@ -23,18 +23,30 @@ func LoadEnvVars() {
 	for scanner.Scan() {
 		line := scanner.Text() // Get the line as a string
 
-		data := strings.Split(line, "=")
-		var temp string
-		if len(data) < 2 {
-			temp = data[0]
-			data = append(data[:0], data[:1]...)
+		// If there is a Problem
+		if strings.HasPrefix(line, "#") {
+			continue
 		}
-		err := os.Setenv(temp, strings.Join(data, ""))
+
+		//Removes every " in the line, because its just for blank spaces
+		line = strings.Replace(line, "\"", "", -1)
+		//Split the Line into 2 parts between the first "="
+		fmt.Println("Nach der Tri: ", line)
+		data := strings.SplitN(line, "=", 2)
+
+		fmt.Println(data[1])
+
+		if len(data) < 2 {
+			log.Printf("Skip data %s. Reason: '=' count under 2\n", data)
+			continue
+		}
+
+		err := os.Setenv(data[0], data[1])
+
 		if err != nil {
 			log.Fatalf("failed to set env var: %s", err)
 			return
 		}
 
-		fmt.Println(os.Getenv(temp))
 	}
 }

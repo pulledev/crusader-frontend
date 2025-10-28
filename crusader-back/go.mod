@@ -1,6 +1,6 @@
-module backend
+module github.com/pulledev/crusader-frontend/crusader-back
 
-go 1.24.8
+go 1.25.3
 
 tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
 
