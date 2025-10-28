@@ -7,10 +7,9 @@ import (
 import "time"
 
 type Member struct {
-	discordId string `gorm:"primaryKey;autoIncrement:false"`
-	steamId   string
-	name      string
-	Element   Element
+	DiscordId string `gorm:"primaryKey;autoIncrement:false"`
+	SteamId   string
+	Mame      string
 	CreatedAt time.Time
 	UpdatedAT time.Time
 }

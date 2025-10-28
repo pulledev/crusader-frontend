@@ -23,7 +23,7 @@ func LoadEnvVars() {
 	for scanner.Scan() {
 		line := scanner.Text() // Get the line as a string
 
-		// If there is a Problem
+		// If there is a comment that is marked with #
 		if strings.HasPrefix(line, "#") {
 			continue
 		}
