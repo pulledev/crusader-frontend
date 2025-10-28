@@ -1,32 +1,28 @@
 package api
 
 import (
-	"encoding/json"
+	"fmt"
+	"github.com/pulledev/crusader-frontend/crusader-back/initializers"
+	"gorm.io/gorm"
 	"net/http"
 )
 
 // ensure that we've conformed to the `ServerInterface` with a compile-time check
 var _ ServerInterface = (*Server)(nil)
 
-// urlExample := "postgres://username:password@localhost:5432/database_name"
-//conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
-
 type Server struct{}
 
-func NewServer() Server {
-	return Server{}
+func (s Server) ListMembers(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
 }
 
-// (GET /ping)
-func (Server) GetPing(w http.ResponseWriter, r *http.Request) {
-	resp := Pong{
-		Ping: "pong",
-	}
+func (s Server) PostMemberSignin(w http.ResponseWriter, r *http.Request) {
+	var signinRequest SigninRequest
 
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(resp)
+	fmt.Println(signinRequest)
+
+	panic("implement me")
 }
 
-func (Server) GetMembers(w http.ResponseWriter, r *http.Request) {
-
-}
+var db *gorm.DB = initializers.GetDB()

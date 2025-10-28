@@ -9,7 +9,8 @@ import "time"
 type Member struct {
 	DiscordId string `gorm:"primaryKey;autoIncrement:false"`
 	SteamId   string
-	Mame      string
+	Name      string
+	Password  string
 	CreatedAt time.Time
 	UpdatedAT time.Time
 }

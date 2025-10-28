@@ -2,41 +2,123 @@ openapi: "3.0.0"
 info:
   version: 0.0.1
   title: Crusader API
+  description: Crusader Backend API
 paths:
-  /ping:
-    get:
-      responses:
-        '200':
-          description: pet response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pong'
 
-  /members:
+  /member/list:
     get:
+      operationId: listMembers
+      description: |
+        Returns a list of all Members.
       responses:
-        '200':
-          description: list of members
+        200:
+          description: list of all Members
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Member'
+
+
+  /member/signin:
+    post:
+      summary: Meldet ein Mitglied an und gibt ein JWT zurück
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SigninRequest'
+
+      responses:
+        '200':
+          description: Erfolgreich angemeldet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Ungültige Zugangsdaten
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: Ungültige Eingabe
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+
+
+
+
 components:
   schemas:
-    # base types
-    Pong:
-      type: object
-      required:
-        - ping
-      properties:
-        ping:
-          type: string
-          example: pong
     Member:
-      type: array
+      type: object
       properties:
         name:
           type: string
+        steam_id:
+          type: string
+        discord_id:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    SigninRequest:
+      type: object
+      required: [name, password]
+      properties:
+        name:
+          type: string
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [ access_token, token_type, expires_in, member ]
+      properties:
+        access_token:
+          type: string
+          description: JWT Access Token
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          format: int64
+          description: Sekunden bis Ablauf
+        member:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            display_name:
+              type: string
+
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Error code
+        message:
+          type: string
+          description: Error message
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: [ ]
