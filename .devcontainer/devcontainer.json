@@ -1,0 +1,30 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/go-postgres
+{
+  "name": "Go, Svelte & PostgreSQL",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
+
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.live-server",
+        "42Crunch.vscode-openapi",
+        "ms-ossdata.vscode-pgsql"
+      ]
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [5432, 5173, 8080],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "go install github.com/go-delve/delve/cmd/dlv@latest && go install github.com/cweill/gotests/gotests@v1.6.0 && go install golang.org/x/tools/gopls@latest && go install golang.org/x/tools/cmd/goimports@latest && go install honnef.co/go/tools/cmd/staticcheck@latest && cd /workspaces/crusader-frontend/crusader-front && npm ci",
+
+
+}
