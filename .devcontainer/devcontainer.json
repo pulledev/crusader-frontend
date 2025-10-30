@@ -24,7 +24,7 @@
   "forwardPorts": [5432, 5173, 8080],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "go install github.com/go-delve/delve/cmd/dlv@latest && go install github.com/cweill/gotests/gotests@v1.6.0 && go install golang.org/x/tools/gopls@latest && go install golang.org/x/tools/cmd/goimports@latest && go install honnef.co/go/tools/cmd/staticcheck@latest && cd /workspaces/crusader-frontend/crusader-front && npm ci",
+  "postCreateCommand": "cd /workspaces/crusader-frontend/crusader-front && npm ci",
 
 
 }
