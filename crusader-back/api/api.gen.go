@@ -9,62 +9,111 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/oapi-codegen/runtime"
 )
 
 const (
-	BearerAuthScopes = "BearerAuth.Scopes"
+	BearerJwtScopes = "BearerJwt.Scopes"
 )
 
-// AuthResponse defines model for AuthResponse.
-type AuthResponse struct {
-	// AccessToken JWT Access Token
-	AccessToken string `json:"access_token"`
-
-	// ExpiresIn Sekunden bis Ablauf
-	ExpiresIn int64 `json:"expires_in"`
-	Member    struct {
-		DisplayName *string `json:"display_name,omitempty"`
-		Id          *string `json:"id,omitempty"`
-		Name        *string `json:"name,omitempty"`
-	} `json:"member"`
-	TokenType string `json:"token_type"`
+// Member Represantiation of a member
+type Member struct {
+	CreatedAt      string   `json:"created_at"`
+	DiscordId      string   `json:"discord_id"`
+	DiscordNick    string   `json:"discord_nick"`
+	MembershipType string   `json:"membership_type"`
+	Name           string   `json:"name"`
+	Points         string   `json:"points"`
+	Rank           string   `json:"rank"`
+	Stab           []string `json:"stab"`
+	SteamId        string   `json:"steam_id"`
+	Unit           string   `json:"unit"`
+	UpdatedAt      string   `json:"updated_at"`
 }
 
-// Error defines model for Error.
-type Error struct {
-	// Code Error code
-	Code int32 `json:"code"`
+// MemberCreate defines model for MemberCreate.
+type MemberCreate struct {
+	DiscordId      string   `json:"discord_id"`
+	DiscordNick    string   `json:"discord_nick"`
+	MembershipType string   `json:"membership_type"`
+	Name           string   `json:"name"`
+	Points         string   `json:"points"`
+	Rank           string   `json:"rank"`
+	Stab           []string `json:"stab"`
+	SteamId        string   `json:"steam_id"`
+	Unit           string   `json:"unit"`
+}
 
-	// Message Error message
+// MemberPartialUpdate defines model for MemberPartialUpdate.
+type MemberPartialUpdate struct {
+	DiscordId      string   `json:"discord_id"`
+	DiscordNick    string   `json:"discord_nick"`
+	MembershipType string   `json:"membership_type"`
+	Name           string   `json:"name"`
+	Points         string   `json:"points"`
+	Rank           string   `json:"rank"`
+	Stab           []string `json:"stab"`
+	SteamId        string   `json:"steam_id"`
+	Unit           string   `json:"unit"`
+}
+
+// MemberUpdate defines model for MemberUpdate.
+type MemberUpdate struct {
+	DiscordId      string   `json:"discord_id"`
+	DiscordNick    string   `json:"discord_nick"`
+	MembershipType string   `json:"membership_type"`
+	Name           string   `json:"name"`
+	Points         string   `json:"points"`
+	Rank           string   `json:"rank"`
+	Stab           []string `json:"stab"`
+	SteamId        string   `json:"steam_id"`
+	Unit           string   `json:"unit"`
+}
+
+// Id defines model for id.
+type Id = string
+
+// BadRequest defines model for BadRequest.
+type BadRequest struct {
+	Errors *[]struct {
+		Message string `json:"message"`
+	} `json:"errors,omitempty"`
 	Message string `json:"message"`
 }
 
-// Member defines model for Member.
-type Member struct {
-	CreatedAt *string `json:"created_at,omitempty"`
-	DiscordId *string `json:"discord_id,omitempty"`
-	Name      *string `json:"name,omitempty"`
-	SteamId   *string `json:"steam_id,omitempty"`
-	UpdatedAt *string `json:"updated_at,omitempty"`
+// Conflict defines model for Conflict.
+type Conflict struct {
+	Message string `json:"message"`
 }
 
-// SigninRequest defines model for SigninRequest.
-type SigninRequest struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
+// InternalServerErrror defines model for InternalServerErrror.
+type InternalServerErrror struct {
+	Message string `json:"message"`
 }
 
-// PostMemberSigninJSONRequestBody defines body for PostMemberSignin for application/json ContentType.
-type PostMemberSigninJSONRequestBody = SigninRequest
+// NotFound defines model for NotFound.
+type NotFound struct {
+	Message string `json:"message"`
+}
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-
-	// (GET /member/list)
-	ListMembers(w http.ResponseWriter, r *http.Request)
-	// Meldet ein Mitglied an und gibt ein JWT zurück
-	// (POST /member/signin)
-	PostMemberSignin(w http.ResponseWriter, r *http.Request)
+	// Create member
+	// (POST /member)
+	CreateMember(w http.ResponseWriter, r *http.Request)
+	// Delete member
+	// (DELETE /member/{id})
+	RemoveMember(w http.ResponseWriter, r *http.Request, id Id)
+	// Get member
+	// (GET /member/{id})
+	GetMember(w http.ResponseWriter, r *http.Request, id Id)
+	// Patch member
+	// (PATCH /member/{id})
+	PartialUpdateMember(w http.ResponseWriter, r *http.Request, id Id)
+	// Update member
+	// (PUT /member/{id})
+	UpdateMember(w http.ResponseWriter, r *http.Request, id Id)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -76,17 +125,17 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
-// ListMembers operation middleware
-func (siw *ServerInterfaceWrapper) ListMembers(w http.ResponseWriter, r *http.Request) {
+// CreateMember operation middleware
+func (siw *ServerInterfaceWrapper) CreateMember(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+	ctx = context.WithValue(ctx, BearerJwtScopes, []string{})
 
 	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListMembers(w, r)
+		siw.Handler.CreateMember(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -96,17 +145,121 @@ func (siw *ServerInterfaceWrapper) ListMembers(w http.ResponseWriter, r *http.Re
 	handler.ServeHTTP(w, r)
 }
 
-// PostMemberSignin operation middleware
-func (siw *ServerInterfaceWrapper) PostMemberSignin(w http.ResponseWriter, r *http.Request) {
+// RemoveMember operation middleware
+func (siw *ServerInterfaceWrapper) RemoveMember(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+	ctx = context.WithValue(ctx, BearerJwtScopes, []string{})
 
 	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PostMemberSignin(w, r)
+		siw.Handler.RemoveMember(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetMember operation middleware
+func (siw *ServerInterfaceWrapper) GetMember(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerJwtScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetMember(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PartialUpdateMember operation middleware
+func (siw *ServerInterfaceWrapper) PartialUpdateMember(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerJwtScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PartialUpdateMember(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateMember operation middleware
+func (siw *ServerInterfaceWrapper) UpdateMember(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id Id
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerJwtScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateMember(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -236,8 +389,11 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
-	m.HandleFunc("GET "+options.BaseURL+"/member/list", wrapper.ListMembers)
-	m.HandleFunc("POST "+options.BaseURL+"/member/signin", wrapper.PostMemberSignin)
+	m.HandleFunc("POST "+options.BaseURL+"/member", wrapper.CreateMember)
+	m.HandleFunc("DELETE "+options.BaseURL+"/member/{id}", wrapper.RemoveMember)
+	m.HandleFunc("GET "+options.BaseURL+"/member/{id}", wrapper.GetMember)
+	m.HandleFunc("PATCH "+options.BaseURL+"/member/{id}", wrapper.PartialUpdateMember)
+	m.HandleFunc("PUT "+options.BaseURL+"/member/{id}", wrapper.UpdateMember)
 
 	return m
 }
