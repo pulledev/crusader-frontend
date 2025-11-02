@@ -53,4 +53,53 @@ Das Crusader Backend ist der Versuch, verschiedene Prozesse zu etablieren, beste
 <img src="techstack_diagram.png" style="width: 450px" alt="Techstack Diagramm">
 
 
+# Development
 
+Wir benutzen für VS-Code einen Docker Dev Container.
+Dieser funktioniert nur mit VS-Code, aber nicht mit zB Goland(IntelliJ)
+
+Folgendes ist vorausgesetzt für eine funktionieren Enwicklungsumgebung für Front- und Backend:
+- Linux(zB über WSL)
+- Go 1.25
+- git, curl, postgres-client
+- nodejs und npm
+- Docker
+
+Folgende Schritte sind zu beachten:
+
+1. Datenbank und Adminer starten (im Root-Ordner)
+    
+    Abrufbar unter localhost:8081 und localhost:5432
+    ```
+   docker compose up -d
+   ```
+2. .env Datei mit Daten füllen
+    ```
+   DB_URL="host=localhost user=postgres password=crusader dbname=crusader port=5432 sslmode=disable TimeZone=Europe/Berlin"
+   ```
+3. In `crusader-back/` wechseln
+4. Folgende Pakete installieren.
+    ```
+    go install github.com/go-delve/delve/cmd/dlv@latest \
+    && go install github.com/cweill/gotests/gotests@v1.6.0 \
+    && go install golang.org/x/tools/gopls@latest \
+    && go install golang.org/x/tools/cmd/goimports@latest \
+    && go install honnef.co/go/tools/cmd/staticcheck@latest
+    ```
+5. ORM Models migrieren
+     ```
+   go run migrate/migrate.go
+   ```
+6. API Backend kann gestartet werden (port 8080)
+      ```
+   go run .
+   ```
+7. In `crusader-front/` wechseln
+8. Npm Pakete installieren
+      ```
+   npm i
+   ```
+9. Frontend Server starten (port 5173)
+      ```
+   npm run dev
+   ```
