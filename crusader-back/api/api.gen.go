@@ -6,10 +6,17 @@
 package api
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"net/http"
+	"net/url"
+	"path"
+	"strings"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/oapi-codegen/runtime"
 )
 
@@ -17,7 +24,7 @@ const (
 	BearerJwtScopes = "BearerJwt.Scopes"
 )
 
-// Member Represantiation of a member
+// Member Representation of a member
 type Member struct {
 	CreatedAt      string   `json:"created_at"`
 	DiscordId      string   `json:"discord_id"`
@@ -34,28 +41,28 @@ type Member struct {
 
 // MemberCreate defines model for MemberCreate.
 type MemberCreate struct {
-	DiscordId      string   `json:"discord_id"`
-	DiscordNick    string   `json:"discord_nick"`
-	MembershipType string   `json:"membership_type"`
-	Name           string   `json:"name"`
-	Points         string   `json:"points"`
-	Rank           string   `json:"rank"`
-	Stab           []string `json:"stab"`
-	SteamId        string   `json:"steam_id"`
-	Unit           string   `json:"unit"`
+	DiscordId      string    `json:"discord_id"`
+	DiscordNick    string    `json:"discord_nick"`
+	MembershipType string    `json:"membership_type"`
+	Name           string    `json:"name"`
+	Points         string    `json:"points"`
+	Rank           string    `json:"rank"`
+	Stab           *[]string `json:"stab,omitempty"`
+	SteamId        string    `json:"steam_id"`
+	Unit           *string   `json:"unit,omitempty"`
 }
 
 // MemberPartialUpdate defines model for MemberPartialUpdate.
 type MemberPartialUpdate struct {
-	DiscordId      string   `json:"discord_id"`
-	DiscordNick    string   `json:"discord_nick"`
-	MembershipType string   `json:"membership_type"`
-	Name           string   `json:"name"`
-	Points         string   `json:"points"`
-	Rank           string   `json:"rank"`
-	Stab           []string `json:"stab"`
-	SteamId        string   `json:"steam_id"`
-	Unit           string   `json:"unit"`
+	DiscordId      *string   `json:"discord_id,omitempty"`
+	DiscordNick    *string   `json:"discord_nick,omitempty"`
+	MembershipType *string   `json:"membership_type,omitempty"`
+	Name           *string   `json:"name,omitempty"`
+	Points         *string   `json:"points,omitempty"`
+	Rank           *string   `json:"rank,omitempty"`
+	Stab           *[]string `json:"stab,omitempty"`
+	SteamId        *string   `json:"steam_id,omitempty"`
+	Unit           *string   `json:"unit,omitempty"`
 }
 
 // MemberUpdate defines model for MemberUpdate.
@@ -77,7 +84,7 @@ type Id = string
 // BadRequest defines model for BadRequest.
 type BadRequest struct {
 	Errors *[]struct {
-		Message string `json:"message"`
+		Message *string `json:"message,omitempty"`
 	} `json:"errors,omitempty"`
 	Message string `json:"message"`
 }
@@ -87,8 +94,8 @@ type Conflict struct {
 	Message string `json:"message"`
 }
 
-// InternalServerErrror defines model for InternalServerErrror.
-type InternalServerErrror struct {
+// InternalServerError defines model for InternalServerError.
+type InternalServerError struct {
 	Message string `json:"message"`
 }
 
@@ -96,6 +103,15 @@ type InternalServerErrror struct {
 type NotFound struct {
 	Message string `json:"message"`
 }
+
+// CreateMemberJSONRequestBody defines body for CreateMember for application/json ContentType.
+type CreateMemberJSONRequestBody = MemberCreate
+
+// PartialUpdateMemberJSONRequestBody defines body for PartialUpdateMember for application/json ContentType.
+type PartialUpdateMemberJSONRequestBody = MemberPartialUpdate
+
+// UpdateMemberJSONRequestBody defines body for UpdateMember for application/json ContentType.
+type UpdateMemberJSONRequestBody = MemberUpdate
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -396,4 +412,101 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("PUT "+options.BaseURL+"/member/{id}", wrapper.UpdateMember)
 
 	return m
+}
+
+// Base64 encoded, gzipped, json marshaled Swagger object
+var swaggerSpec = []string{
+
+	"H4sIAAAAAAAC/+xZ3W4bNxN9FYLfd9ECC0lpXCDVXeMmgYOmMOwEvTAEgyJHFuNdkhnOyhYMvXsx5Opn",
+	"pbVsN4lrBL4JsrtDzpw5B/Mj30jtq+AdOIpyeCODQlUBAaYna/hfA1GjDWS9k0NpbNQezbk14qeAtlI4",
+	"F5cwF34ilKigGgP+LAtp2TYomspCOlWBHPJthUT4UlsEI4eENRQy6ilUit3QPLBVJLTuQi4WCzaOwbsI",
+	"KZjXypzAlxoi8ZP2jsCl/6oQSqsVx9f/HDnIm41rA/oASDZfAoi+wUZQxV2DCmJUF9AVULF848efQZNc",
+	"v1CIas7Pe0+voZ+tDEc7l7JlO+MfpyAi4AxQaF+XRjhPonYGMJJyRtAUBObMCFODIC+sm6nSGhHnjtR1",
+	"j0M79G5SWv01yftu6JbRr+GNQbAwSyAwS1BK6AaDuLI0Tbh1jQiORCRFwBrMyYi+Rg0J95EjQKfK05TB",
+	"N8z/U0xBQzA47WuOGIxQTtQOrgNoToL2zlg+IGiqSASEGTj+YElM0FdiUpcTW5bWXWwqIuXgL09vfe3M",
+	"EwaulWPeJ7YtaDCbbC6W9SKF9CEVm90KdQIBIYKjhGyzMMliC5VGUATmXFEHsGKj1u397Ky+7DTIXuPU",
+	"hvP8rcMmF8eOD8HbpijvfELluh1GUuNWcdux2K5YkUBVtwGsne1OTB3M7XnbEkQC2MrlhtcGywptsUlJ",
+	"E0ADazedWwy0whp1VOssmMPkYFfhz2Tb+7O5zdoGoS2itwjaztHtLB0rJKvKT4nRZ7LuT9Yt+XxO5COq",
+	"/kFlq6NRFjKCrtHS/JTbXTP/gkLA91cp3HF6eOux4hIs3//9UTa9kS/KX+Xq4ilRyP3Xuonf7ZhvrhXP",
+	"WuLK42UMSnOMZKnks4dYR2UAxe/HR7KQM8CYDw16g94LTqEP4FSwcihf9ga9l5wgRdMUc79a9ejg8+De",
+	"9pyLcRRKOLgSCJyWNMbNA4is3J5MLjB18yOzOvRh2dKbUeG1N/MHDTj/R5jIofxff70C9Zvxot9qFYu2",
+	"HHhx2V5Ofhm8+Ma+75qVr1QUsdYaYpzUZSF4E1hmMQ9MyaRpp2kMPBgMbvO9AtPfWLPSkd/uPrJaLRaF",
+	"/PU+Prpm8k3Vy+FZS+9no8WokLGueNtcCWA91JG6iHn2TC9GfFcjvf6NNYusO14mdhX4R3rPCryn+k6g",
+	"8rO1+jY35rNu4GuTvjWSoWxp52A3rH1Uj2viGRlB2CicF43qeEdCoBrdv2f74O4jq2XisdjODO1hu5AX",
+	"QF17AOfiAcy+A/qmtA4eoSScrnRRzpl9tDCDvEJVDcwfSQvvgPYKISjS010pNNNkORd5RXiAKFqD6NfK",
+	"43s1qva0fK9+9ejiTNT8wNI8Znz7xVl3VKlPDxXk01bik5Zg8/vAfyHBpzlIZbb2DVLpMr48y6ud3D+9",
+	"VqUwMIPShyr9DptseQXCslk8hv1+yXZTH2n4avBqkBTYeNq+MRMpEMpE1Er5cf1nhCa2xWjxTwAAAP//",
+	"7ydz270YAAA=",
+}
+
+// GetSwagger returns the content of the embedded swagger specification file
+// or error if failed to decode
+func decodeSpec() ([]byte, error) {
+	zipped, err := base64.StdEncoding.DecodeString(strings.Join(swaggerSpec, ""))
+	if err != nil {
+		return nil, fmt.Errorf("error base64 decoding spec: %w", err)
+	}
+	zr, err := gzip.NewReader(bytes.NewReader(zipped))
+	if err != nil {
+		return nil, fmt.Errorf("error decompressing spec: %w", err)
+	}
+	var buf bytes.Buffer
+	_, err = buf.ReadFrom(zr)
+	if err != nil {
+		return nil, fmt.Errorf("error decompressing spec: %w", err)
+	}
+
+	return buf.Bytes(), nil
+}
+
+var rawSpec = decodeSpecCached()
+
+// a naive cached of a decoded swagger spec
+func decodeSpecCached() func() ([]byte, error) {
+	data, err := decodeSpec()
+	return func() ([]byte, error) {
+		return data, err
+	}
+}
+
+// Constructs a synthetic filesystem for resolving external references when loading openapi specifications.
+func PathToRawSpec(pathToFile string) map[string]func() ([]byte, error) {
+	res := make(map[string]func() ([]byte, error))
+	if len(pathToFile) > 0 {
+		res[pathToFile] = rawSpec
+	}
+
+	return res
+}
+
+// GetSwagger returns the Swagger specification corresponding to the generated code
+// in this file. The external references of Swagger specification are resolved.
+// The logic of resolving external references is tightly connected to "import-mapping" feature.
+// Externally referenced files must be embedded in the corresponding golang packages.
+// Urls can be supported but this task was out of the scope.
+func GetSwagger() (swagger *openapi3.T, err error) {
+	resolvePath := PathToRawSpec("")
+
+	loader := openapi3.NewLoader()
+	loader.IsExternalRefsAllowed = true
+	loader.ReadFromURIFunc = func(loader *openapi3.Loader, url *url.URL) ([]byte, error) {
+		pathToFile := url.String()
+		pathToFile = path.Clean(pathToFile)
+		getSpec, ok := resolvePath[pathToFile]
+		if !ok {
+			err1 := fmt.Errorf("path not found: %s", pathToFile)
+			return nil, err1
+		}
+		return getSpec()
+	}
+	var specData []byte
+	specData, err = rawSpec()
+	if err != nil {
+		return
+	}
+	swagger, err = loader.LoadFromData(specData)
+	if err != nil {
+		return
+	}
+	return
 }

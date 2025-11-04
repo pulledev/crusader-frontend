@@ -31,6 +31,16 @@ paths:
           $ref: "#/components/responses/InternalServerErrror"
       description: Creates a new record of type Member.
       operationId: createMember
+      parameters:
+        - in: query
+          name: data
+          required: true
+          style: form
+          description: ""
+          explode: true
+          schema:
+            $ref: "#/components/schemas/MemberCreate"
+          allowReserved: false
   /member/{id}:
     get:
       tags:
