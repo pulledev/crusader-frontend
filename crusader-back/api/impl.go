@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/pulledev/crusader-frontend/crusader-back/initializers"
-	"github.com/pulledev/crusader-frontend/crusader-back/model"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/pulledev/crusader-frontend/crusader-back/initializers"
+	"github.com/pulledev/crusader-frontend/crusader-back/model"
+	"gorm.io/gorm"
 )
 
 // ensure that we've conformed to the `ServerInterface` with a compile-time check
@@ -32,7 +33,7 @@ func jsonToStruct[T any](r *http.Request) *T {
 	return &obj
 }
 
-func ptrToUint(p *int) uint {
+func ptrToUint[T ~int | ~uint | ~float64](p *T) uint {
 	if p == nil {
 		return 0
 	}
@@ -44,24 +45,22 @@ func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 
 	//DB Shit:
 
-	/*
-		m := model.Member{
-			DiscordId:        member.DiscordId,
-			Name:             member.Name,
-			SteamId:          member.SteamId,
-			UnitID:           ptrToUint(member.Unit),
-			MembershipTypeID: uint(member.MembershipType),
-			RankLevel:        ,
-			Stab:             nil,
-			DiscordNick:      "",
-			CreatedAt:        time.Time{},
-			UpdatedAt:        time.Time{},
-			DeletedAt:        gorm.DeletedAt{},
-		}
+	m := model.Member{
+		DiscordId:        member.DiscordId,
+		Name:             member.Name,
+		SteamId:          member.SteamId,
+		UnitID:           ptrToUint[int](member.Unit),
+		MembershipTypeID: uint(member.MembershipType),
+		RankLevel:        *member.Rank,
+		Stab:             nil,
+		DiscordNick:      member.DiscordNick,
+		CreatedAt:        time.Time{},
+		UpdatedAt:        time.Time{},
+		DeletedAt:        gorm.DeletedAt{},
+	}
 
-	*/
-
-	log.Println("Queried Member:", member)
+	db.Create(&m)
+	log.Println("Queried Member:", m)
 }
 
 func (s Server) PartialUpdateMember(w http.ResponseWriter, r *http.Request, id Id) {
