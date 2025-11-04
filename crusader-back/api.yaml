@@ -193,7 +193,6 @@ components:
       type: object
       required:
         - name
-        - rank
         - points
         - steam_id
         - discord_id
@@ -203,15 +202,15 @@ components:
         name:
           type: string
         rank:
-          type: string
+          type: integer
         stab:
-          type: array
+          type: integer
           items:
-            type: string
+            type: integer
         unit:
-          type: string
+          type: integer
         points:
-          type: string
+          type: integer
         steam_id:
           type: string
         discord_id:
@@ -219,7 +218,7 @@ components:
         discord_nick:
           type: string
         membership_type:
-          type: string
+          type: integer
 
     MemberUpdate:
       type: object

@@ -8,7 +8,9 @@ import (
 	"github.com/pulledev/crusader-frontend/crusader-back/initializers"
 	"github.com/pulledev/crusader-frontend/crusader-back/model"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
+	"time"
 )
 
 // ensure that we've conformed to the `ServerInterface` with a compile-time check
@@ -18,13 +20,48 @@ var db *gorm.DB = initializers.GetDB()
 
 type Server struct{}
 
-func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
-	var member MemberCreate
-
+func jsonToStruct[T any](r *http.Request) *T {
+	var obj T
 	decoder := json.NewDecoder(r.Body)
+	//Good to know: Es wird sehr wahrscheinlich nicht zu err kommen, da alles fehlerhafte bereits in der middleware abgefangen wird. Trotzdem um sicher zu gehen :)
+	err := decoder.Decode(&obj)
+	if err != nil {
+		log.Println("failed to decode Body: ", err)
+	}
 
-	decoder.Decode(&member)
+	return &obj
+}
 
+func ptrToUint(p *int) uint {
+	if p == nil {
+		return 0
+	}
+	return uint(*p)
+}
+
+func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
+	member := jsonToStruct[MemberCreate](r)
+
+	//DB Shit:
+
+	/*
+		m := model.Member{
+			DiscordId:        member.DiscordId,
+			Name:             member.Name,
+			SteamId:          member.SteamId,
+			UnitID:           ptrToUint(member.Unit),
+			MembershipTypeID: uint(member.MembershipType),
+			RankLevel:        ,
+			Stab:             nil,
+			DiscordNick:      "",
+			CreatedAt:        time.Time{},
+			UpdatedAt:        time.Time{},
+			DeletedAt:        gorm.DeletedAt{},
+		}
+
+	*/
+
+	log.Println("Queried Member:", member)
 }
 
 func (s Server) PartialUpdateMember(w http.ResponseWriter, r *http.Request, id Id) {

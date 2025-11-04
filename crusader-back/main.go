@@ -28,6 +28,7 @@ func main() {
 	options := &middleware.Options{
 		Options: openapi3filter.Options{
 			AuthenticationFunc: openapi3filter.NoopAuthenticationFunc,
+			//TODO: Implement the JWT Auth
 		},
 	}
 
