@@ -43,9 +43,9 @@ type Member struct {
 	DiscordId        string `gorm:"primaryKey;autoIncrement:false"`
 	Name             string
 	SteamId          string
-	UnitID           uint           `gorm:"default:0"`
+	UnitID           int            `gorm:"default:0"`
 	Unit             Unit           `gorm:"foreignKey:UnitID"`
-	MembershipTypeID uint           `gorm:"default:0"`
+	MembershipTypeID int            `gorm:"default:0"`
 	MembershipType   MembershipType `gorm:"foreignKey:MembershipTypeID"`
 	RankLevel        int            `gorm:"default:0"`
 	Rank             Rank           `gorm:"foreignKey:RankLevel;default:0"`

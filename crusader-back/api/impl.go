@@ -33,6 +33,23 @@ func jsonToStruct[T any](r *http.Request) *T {
 	return &obj
 }
 
+type ErrorResponse struct {
+	Code        int    `json:"code"`
+	Message     string `json:"message"`
+	GormMessage string `json:"database_message"`
+}
+
+func writeErrorInJson(w http.ResponseWriter, status int, msg string, gormErr error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	var g string = fmt.Sprint(gormErr)
+	json.NewEncoder(w).Encode(ErrorResponse{
+		Code:        status,
+		Message:     msg,
+		GormMessage: g,
+	})
+}
+
 func ptrToUint[T ~int | ~uint | ~float64](p *T) uint {
 	if p == nil {
 		return 0
@@ -49,8 +66,8 @@ func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 		DiscordId:        member.DiscordId,
 		Name:             member.Name,
 		SteamId:          member.SteamId,
-		UnitID:           ptrToUint[int](member.Unit),
-		MembershipTypeID: uint(member.MembershipType),
+		UnitID:           *member.Unit,
+		MembershipTypeID: member.MembershipType,
 		RankLevel:        *member.Rank,
 		Stab:             nil,
 		DiscordNick:      member.DiscordNick,
@@ -59,8 +76,26 @@ func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 		DeletedAt:        gorm.DeletedAt{},
 	}
 
-	db.Create(&m)
+	result := db.Create(&m)
+	if result.Error != nil {
+
+		var msg string = fmt.Sprint("Could not create Member: ", result.Error)
+		log.Println(msg)
+		fmt.Println(result.Error)
+
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
+			result.
+				writeErrorInJson(w, 409, "Mitglied existiert bereits", gorm.ErrDuplicatedKey)
+
+		} else {
+			writeErrorInJson(w, 409, "Mitglied konnte nicht erstellt werden", result.Error)
+
+		}
+
+	}
+
 	log.Println("Queried Member:", m)
+
 }
 
 func (s Server) PartialUpdateMember(w http.ResponseWriter, r *http.Request, id Id) {
@@ -75,7 +110,6 @@ func (s Server) RemoveMember(w http.ResponseWriter, r *http.Request, id Id) {
 
 func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 	ctx := context.Background()
-	fmt.Println("test")
 
 	member, err := gorm.G[model.Member](db).Where("discord_id = ?", id).First(ctx)
 	errors.Is(err, gorm.ErrRecordNotFound)
