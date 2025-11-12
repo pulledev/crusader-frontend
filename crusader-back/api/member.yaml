@@ -170,7 +170,7 @@ components:
         stab:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Stab"
         unit:
           type: string
         points:
@@ -277,6 +277,66 @@ components:
           type: string
         membership_type:
           type: string
+
+    Rank:
+      type: object
+      properties:
+        level:
+          type: integer
+        name:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    Stab:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    Unit_Role:
+      type: object
+      properties:
+        id:
+          type: integer
+        unit_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    Unit:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        discord_role_id:
+          type: string
+    Membership_Type:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+
+
 
   responses:
     Conflict:

@@ -84,8 +84,8 @@ func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(result.Error)
 
 		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
-			result.
-				writeErrorInJson(w, 409, "Mitglied existiert bereits", gorm.ErrDuplicatedKey)
+			//result.
+			//writeErrorInJson(w, 409, "Mitglied existiert bereits", gorm.ErrDuplicatedKey)
 
 		} else {
 			writeErrorInJson(w, 409, "Mitglied konnte nicht erstellt werden", result.Error)
@@ -111,7 +111,16 @@ func (s Server) RemoveMember(w http.ResponseWriter, r *http.Request, id Id) {
 func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 	ctx := context.Background()
 
-	member, err := gorm.G[model.Member](db).Where("discord_id = ?", id).First(ctx)
+	//member, err := gorm.G[model.Member](db).Where("discord_id = ?", id).First(ctx)
+	member, err := gorm.G[model.Member](db).
+		Preload("Unit", func(db gorm.PreloadBuilder) error { return nil }).
+		Preload("UnitRole", func(db gorm.PreloadBuilder) error { return nil }).
+		Preload("MembershipType", func(db gorm.PreloadBuilder) error { return nil }).
+		Preload("Rank", func(db gorm.PreloadBuilder) error { return nil }).
+		Preload("Stab", func(db gorm.PreloadBuilder) error { return nil }).
+		Where("discord_id = ?", id).
+		First(ctx)
+
 	errors.Is(err, gorm.ErrRecordNotFound)
 
 	if err == nil {

@@ -11,12 +11,13 @@ type Unit struct {
 	Name          string
 	Description   string
 	DiscordRoleId string
-	UnitRole      []UnitRole `gorm:"many2many:unit_unitRoles;"`
 }
 
 type UnitRole struct {
 	gorm.Model
-	Name        string `gorm:"unique;"`
+	UnitID      uint `gorm:"default:0"`
+	Unit        Unit `gorm:"foreignKey:UnitID"`
+	Name        string
 	Description string
 }
 
@@ -45,6 +46,8 @@ type Member struct {
 	SteamId          string
 	UnitID           int            `gorm:"default:0"`
 	Unit             Unit           `gorm:"foreignKey:UnitID"`
+	UnitRoleID       int            `gorm:"default:0"`
+	UnitRole         UnitRole       `gorm:"foreignKey:UnitRoleID"`
 	MembershipTypeID int            `gorm:"default:0"`
 	MembershipType   MembershipType `gorm:"foreignKey:MembershipTypeID"`
 	RankLevel        int            `gorm:"default:0"`
