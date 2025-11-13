@@ -43,16 +43,15 @@ type Stab struct {
 type Member struct {
 	DiscordId        string `gorm:"primaryKey;autoIncrement:false"`
 	Name             string
+	Points           *float32
 	SteamId          string
-	UnitID           int            `gorm:"default:0"`
-	Unit             Unit           `gorm:"foreignKey:UnitID"`
-	UnitRoleID       int            `gorm:"default:0"`
-	UnitRole         UnitRole       `gorm:"foreignKey:UnitRoleID"`
-	MembershipTypeID int            `gorm:"default:0"`
+	UnitRoleID       *int           `gorm:"default:null"`
+	UnitRole         *UnitRole      `gorm:"foreignKey:UnitRoleID"`
+	MembershipTypeID int            `gorm:"default:null"`
 	MembershipType   MembershipType `gorm:"foreignKey:MembershipTypeID"`
-	RankLevel        int            `gorm:"default:0"`
-	Rank             Rank           `gorm:"foreignKey:RankLevel;default:0"`
-	Stab             []Stab         `gorm:"many2many:member_stab;"`
+	RankLevel        *int           `gorm:"default:null"`
+	Rank             *Rank          `gorm:"foreignKey:RankLevel"`
+	Stab             *[]Stab        `gorm:"many2many:member_stab;"`
 	DiscordNick      string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time

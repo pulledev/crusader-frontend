@@ -152,189 +152,268 @@ components:
       type: object
       required:
         - name
-        - discord_id
-        - steam_id
-        - rank
-        - points
-        - created_at
-        - unit
-        - stab
-        - membership_type
-        - discord_nick
-        - updated_at
+        - membershipType
+        - steamId
+        - discordId
+        - discordNick
       properties:
         name:
           type: string
+          example: "Max"
         rank:
-          type: string
+          $ref: "#/components/schemas/Rank"
         stab:
           type: array
           items:
             $ref: "#/components/schemas/Stab"
-        unit:
-          type: string
+        unitRole:
+          $ref: "#/components/schemas/UnitRole"
+
+        membershipType:
+          $ref: "#/components/schemas/Membership_Type"
+
         points:
+          type: number
+          example: 100
+        steamId:
           type: string
-        steam_id:
+          example: "A11111111111"
+        discordId:
           type: string
+          example: "011111111111"
+        discordNick:
+          type: string
+          example: "Max Brain"
         created_at:
           type: string
-        discord_id:
-          type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
         updated_at:
           type: string
-        discord_nick:
-          type: string
-        membership_type:
-          type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
       description: Representation of a member
 
     MemberCreate:
       type: object
       required:
         - name
-        - points
-        - steam_id
-        - discord_id
-        - discord_nick
-        - membership_type
+        - membershipTypeId
+        - steamId
+        - discordId
+        - discordNick
       properties:
         name:
           type: string
-        rank:
+          example: "Max"
+        rankLevel:
           type: integer
-        stab:
-          type: integer
+          example: 1
+        stabIds:
+          type: array
           items:
             type: integer
-        unit:
+            example: 1
+        unitRoleId:
           type: integer
+          example: 1
+        membershipTypeId:
+          type: integer
+          example: 1
+
         points:
-          type: integer
-        steam_id:
+          type: number
+          example: 100
+        steamId:
           type: string
-        discord_id:
+          example: "A11111111111"
+        discordId:
           type: string
-        discord_nick:
+          example: "011111111111"
+        discordNick:
           type: string
-        membership_type:
-          type: integer
+          example: "Max Brain"
+      description: Representation of a member creation
 
     MemberUpdate:
       type: object
       required:
         - name
-        - rank
+        - membershipTypeId
+        - rankLevel
+        - stabIds
         - points
-        - steam_id
-        - discord_id
-        - unit
-        - stab
-        - membership_type
-        - discord_nick
+        - steamId
+        - discordId
+        - discordNick
       properties:
         name:
           type: string
-        rank:
-          type: string
-        stab:
+          example: "Max"
+        rankLevel:
+          type: integer
+          example: 1
+        stabIds:
           type: array
           items:
-            type: string
-        unit:
-          type: string
+            type: integer
+            example: 1
+        unitRoleId:
+          type: integer
+          example: 1
+        membershipTypeId:
+          type: integer
+          example: 1
+
         points:
+          type: number
+          example: 100
+        steamId:
           type: string
-        steam_id:
+          example: "A11111111111"
+        discordId:
           type: string
-        discord_id:
+          example: "011111111111"
+        discordNick:
           type: string
-        discord_nick:
-          type: string
-        membership_type:
-          type: string
+          example: "Max Brain"
+      description: Representation of a member update
 
     MemberPartialUpdate:
       type: object
       properties:
         name:
           type: string
-        rank:
-          type: string
-        stab:
+          example: "Max"
+        rankLevel:
+          type: integer
+          example: 1
+        stabIds:
           type: array
           items:
-            type: string
-        unit:
-          type: string
+            type: integer
+            example: 1
+        unitRoleId:
+          type: integer
+          example: 1
+        membershipTypeId:
+          type: integer
+          example: 1
+
         points:
+          type: number
+          example: 100
+        steamId:
           type: string
-        steam_id:
+          example: "A11111111111"
+        discordId:
           type: string
-        discord_id:
+          example: "011111111111"
+        discordNick:
           type: string
-        discord_nick:
-          type: string
-        membership_type:
-          type: string
+          example: "Max Brain"
+      description: Representation of a partial member update
 
     Rank:
       type: object
       properties:
         level:
           type: integer
+          example: 1
         name:
           type: string
+          example: "Gefreiter"
         created_at:
           type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
         updated_at:
           type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
 
     Stab:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: "S6"
         description:
           type: string
+          example: "Technische Administration"
         created_at:
           type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
         updated_at:
           type: string
-    Unit_Role:
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
+    UnitRole:
       type: object
       properties:
         id:
           type: integer
-        unit_id:
-          type: integer
+          example: 1
+        unit:
+          $ref: "#/components/schemas/Stab"
         name:
           type: string
+          example: "Funker"
         description:
           type: string
+          example: "Funkt mit TOC"
         created_at:
           type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
         updated_at:
           type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
     Unit:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         name:
           type: string
+          example: "Alpha"
         description:
           type: string
+          example: "Angriffs Element"
         discord_role_id:
           type: string
+          example: "111111111111"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
     Membership_Type:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         name:
+          type: string
+          example: "Anwärter"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-11-04 22:39:40.061613+00"
 
 
 

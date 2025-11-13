@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/oapi-codegen/runtime"
@@ -26,56 +27,91 @@ const (
 
 // Member Representation of a member
 type Member struct {
-	CreatedAt      string   `json:"created_at"`
-	DiscordId      string   `json:"discord_id"`
-	DiscordNick    string   `json:"discord_nick"`
-	MembershipType string   `json:"membership_type"`
-	Name           string   `json:"name"`
-	Points         string   `json:"points"`
-	Rank           string   `json:"rank"`
-	Stab           []string `json:"stab"`
-	SteamId        string   `json:"steam_id"`
-	Unit           string   `json:"unit"`
-	UpdatedAt      string   `json:"updated_at"`
+	CreatedAt      *time.Time     `json:"created_at,omitempty"`
+	DiscordId      string         `json:"discordId"`
+	DiscordNick    string         `json:"discordNick"`
+	MembershipType MembershipType `json:"membershipType"`
+	Name           string         `json:"name"`
+	Points         *float32       `json:"points,omitempty"`
+	Rank           *Rank          `json:"rank,omitempty"`
+	Stab           *[]Stab        `json:"stab,omitempty"`
+	SteamId        string         `json:"steamId"`
+	UnitRole       *UnitRole      `json:"unitRole,omitempty"`
+	UpdatedAt      *time.Time     `json:"updated_at,omitempty"`
 }
 
-// MemberCreate defines model for MemberCreate.
+// MemberCreate Representation of a member creation
 type MemberCreate struct {
-	DiscordId      string `json:"discord_id"`
-	DiscordNick    string `json:"discord_nick"`
-	MembershipType int    `json:"membership_type"`
-	Name           string `json:"name"`
-	Points         int    `json:"points"`
-	Rank           *int   `json:"rank,omitempty"`
-	Stab           *int   `json:"stab,omitempty"`
-	SteamId        string `json:"steam_id"`
-	Unit           *int   `json:"unit,omitempty"`
+	DiscordId        string   `json:"discordId"`
+	DiscordNick      string   `json:"discordNick"`
+	MembershipTypeId int      `json:"membershipTypeId"`
+	Name             string   `json:"name"`
+	Points           *float32 `json:"points,omitempty"`
+	RankLevel        *int     `json:"rankLevel,omitempty"`
+	StabIds          *[]int   `json:"stabIds,omitempty"`
+	SteamId          string   `json:"steamId"`
+	UnitRoleId       *int     `json:"unitRoleId,omitempty"`
 }
 
-// MemberPartialUpdate defines model for MemberPartialUpdate.
+// MemberPartialUpdate Representation of a partial member update
 type MemberPartialUpdate struct {
-	DiscordId      *string   `json:"discord_id,omitempty"`
-	DiscordNick    *string   `json:"discord_nick,omitempty"`
-	MembershipType *string   `json:"membership_type,omitempty"`
-	Name           *string   `json:"name,omitempty"`
-	Points         *string   `json:"points,omitempty"`
-	Rank           *string   `json:"rank,omitempty"`
-	Stab           *[]string `json:"stab,omitempty"`
-	SteamId        *string   `json:"steam_id,omitempty"`
-	Unit           *string   `json:"unit,omitempty"`
+	DiscordId        *string  `json:"discordId,omitempty"`
+	DiscordNick      *string  `json:"discordNick,omitempty"`
+	MembershipTypeId *int     `json:"membershipTypeId,omitempty"`
+	Name             *string  `json:"name,omitempty"`
+	Points           *float32 `json:"points,omitempty"`
+	RankLevel        *int     `json:"rankLevel,omitempty"`
+	StabIds          *[]int   `json:"stabIds,omitempty"`
+	SteamId          *string  `json:"steamId,omitempty"`
+	UnitRoleId       *int     `json:"unitRoleId,omitempty"`
 }
 
-// MemberUpdate defines model for MemberUpdate.
+// MemberUpdate Representation of a member update
 type MemberUpdate struct {
-	DiscordId      string   `json:"discord_id"`
-	DiscordNick    string   `json:"discord_nick"`
-	MembershipType string   `json:"membership_type"`
-	Name           string   `json:"name"`
-	Points         string   `json:"points"`
-	Rank           string   `json:"rank"`
-	Stab           []string `json:"stab"`
-	SteamId        string   `json:"steam_id"`
-	Unit           string   `json:"unit"`
+	DiscordId        string  `json:"discordId"`
+	DiscordNick      string  `json:"discordNick"`
+	MembershipTypeId int     `json:"membershipTypeId"`
+	Name             string  `json:"name"`
+	Points           float32 `json:"points"`
+	RankLevel        int     `json:"rankLevel"`
+	StabIds          []int   `json:"stabIds"`
+	SteamId          string  `json:"steamId"`
+	UnitRoleId       *int    `json:"unitRoleId,omitempty"`
+}
+
+// MembershipType defines model for Membership_Type.
+type MembershipType struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Id        *int       `json:"id,omitempty"`
+	Name      *string    `json:"name,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+}
+
+// Rank defines model for Rank.
+type Rank struct {
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	Level     *int       `json:"level,omitempty"`
+	Name      *string    `json:"name,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+}
+
+// Stab defines model for Stab.
+type Stab struct {
+	CreatedAt   *time.Time `json:"created_at,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Id          *int       `json:"id,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
+}
+
+// UnitRole defines model for UnitRole.
+type UnitRole struct {
+	CreatedAt   *time.Time `json:"created_at,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	Id          *int       `json:"id,omitempty"`
+	Name        *string    `json:"name,omitempty"`
+	Unit        *Stab      `json:"unit,omitempty"`
+	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
 }
 
 // Id defines model for id.
@@ -417,26 +453,30 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
