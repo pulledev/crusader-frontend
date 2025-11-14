@@ -23,7 +23,8 @@ type UnitRole struct {
 
 type MembershipType struct {
 	gorm.Model
-	Name string
+	Name          string
+	DiscordRoleId string
 }
 
 type Rank struct {

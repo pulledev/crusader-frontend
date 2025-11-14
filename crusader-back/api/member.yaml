@@ -316,6 +316,11 @@ components:
 
     Rank:
       type: object
+      required:
+        - level
+        - name
+        - created_at
+        - updated_at
       properties:
         level:
           type: integer
@@ -334,6 +339,12 @@ components:
 
     Stab:
       type: object
+      required:
+        - id
+        - name
+        - description
+        - created_at
+        - updated_at
       properties:
         id:
           type: integer
@@ -354,12 +365,19 @@ components:
           example: "2025-11-04 22:39:40.061613+00"
     UnitRole:
       type: object
+      required:
+        - id
+        - unit
+        - name
+        - description
+        - created_at
+        - updated_at
       properties:
         id:
           type: integer
           example: 1
         unit:
-          $ref: "#/components/schemas/Stab"
+          $ref: "#/components/schemas/Unit"
         name:
           type: string
           example: "Funker"
@@ -376,6 +394,13 @@ components:
           example: "2025-11-04 22:39:40.061613+00"
     Unit:
       type: object
+      required:
+        - id
+        - name
+        - description
+        - discord_role_id
+        - created_at
+        - updated_at
       properties:
         id:
           type: integer
@@ -399,6 +424,12 @@ components:
           example: "2025-11-04 22:39:40.061613+00"
     Membership_Type:
       type: object
+      required:
+        - id
+        - name
+        - discordRoleId
+        - created_at
+        - updated_at
       properties:
         id:
           type: integer
@@ -406,6 +437,9 @@ components:
         name:
           type: string
           example: "Anwärter"
+        discordRoleId:
+          type: string
+          example: "A1111111111"
         created_at:
           type: string
           format: date-time

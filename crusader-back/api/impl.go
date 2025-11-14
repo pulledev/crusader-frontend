@@ -57,10 +57,6 @@ func ptrToUint[T ~int | ~uint | ~float64](p *T) uint {
 	return uint(*p)
 }
 
-func stringToTime(t string) time.Time {
-	return t.Format(time.RFC3339)
-}
-
 func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 	member := jsonToStruct[MemberCreate](r)
 
@@ -118,30 +114,47 @@ func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 
 	errors.Is(err, gorm.ErrRecordNotFound)
 
-	createdAt := member.CreatedAt.Format(time.RFC3339)
-	updatedAt := member.UpdatedAt.Format(time.RFC3339)
-
-	//TODO: weiterarbeiten hier
-	mT := MembershipType{
-		CreatedAt: &member.MembershipType.CreatedAt,
-		Id:        nil,
-		Name:      &member.MembershipType.Name,
-		UpdatedAt: &member.MembershipType.UpdatedAt,
+	membership := MembershipType{
+		CreatedAt: member.MembershipType.CreatedAt,
+		Id:        int(member.MembershipType.ID),
+		Name:      member.MembershipType.Name,
+		UpdatedAt: member.MembershipType.UpdatedAt,
 	}
-
+	rank := Rank{
+		CreatedAt: member.Rank.CreatedAt,
+		Level:     member.Rank.Level,
+		Name:      member.Rank.Name,
+		UpdatedAt: member.Rank.UpdatedAT,
+	}
+	unit := Unit{
+		CreatedAt:     member.UnitRole.Unit.CreatedAt,
+		Description:   member.UnitRole.Unit.Description,
+		DiscordRoleId: member.UnitRole.Unit.DiscordRoleId,
+		Id:            int(member.UnitRole.Unit.ID),
+		Name:          member.UnitRole.Unit.Name,
+		UpdatedAt:     member.UnitRole.Unit.UpdatedAt,
+	}
+	role := UnitRole{
+		CreatedAt:   member.UnitRole.CreatedAt,
+		Description: member.UnitRole.Description,
+		Id:          int(member.UnitRole.ID),
+		Name:        member.UnitRole.Name,
+		Unit:        unit,
+		UpdatedAt:   member.UnitRole.UpdatedAt,
+	}
 	// Build the response struct with proper type conversions
 	response := Member{
-		CreatedAt:      &createdAt,
+		CreatedAt:      &member.CreatedAt,
 		DiscordId:      member.DiscordId,
 		DiscordNick:    member.DiscordNick,
-		MembershipType: mT,
+		MembershipType: membership,
 		Name:           member.Name,
 		Points:         member.Points,
-		Rank:           (*Rank)(member.Rank),
-		Stab:           (*[]Stab)(member.Stab),
+		Rank:           &rank,
+		Stab:           nil,
 		SteamId:        member.SteamId,
-		UnitRole:       (*UnitRole)(member.UnitRole),
-		UpdatedAt:      &updatedAt,
+		UnitRole:       &role,
+		UpdatedAt:      &member.UpdatedAt,
 	}
 
 	if err == nil {
