@@ -1,5 +1,5 @@
 # Crusader Backend
-### Abstract
+
 Das Crusader Backend ist der Versuch, verschiedene Prozesse zu etablieren, bestehende zu automatisieren und durch ein Datenbanksystem eine Redundanz-arme und Inkonsistenz-freie Speicherung umzusetzen. 
 
 ## Tech-Stack aka the nerdy Part
