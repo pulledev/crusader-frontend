@@ -97,8 +97,59 @@ func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) PartialUpdateMember(w http.ResponseWriter, r *http.Request, id Id) {
-	//TODO implement me
-	panic("implement me")
+	p := jsonToStruct[MemberPartialUpdate](r)
+
+	updates := map[string]any{}
+
+	if p.DiscordNick != nil {
+		updates["discord_nick"] = *p.DiscordNick
+	}
+	if p.MembershipTypeId != nil {
+		updates["membership_type_id"] = *p.MembershipTypeId
+	}
+	if p.Name != nil {
+		updates["name"] = *p.Name
+	}
+	if p.Points != nil {
+		updates["points"] = *p.Points
+	}
+	if p.RankLevel != nil {
+		updates["rank_level"] = *p.RankLevel
+	} // oder rank_id, je nach Schema
+	if p.SteamId != nil {
+		updates["steam_id"] = *p.SteamId
+	}
+	if p.UnitRoleId != nil {
+		updates["unit_role_id"] = *p.UnitRoleId
+	}
+
+	if len(updates) > 0 {
+		if err := db.Model(&model.Member{}).
+			Where("discord_id = ?", id).
+			Updates(updates).Error; err != nil {
+		}
+	}
+
+	if p.StabIds != nil {
+
+		var m model.Member
+
+		if err := db.Select("discord_id").Where("discord_id = ?", id).First(&m).Error; err != nil {
+			writeErrorInJson(w, http.StatusBadRequest, "Fehler bei select von discord_id", err)
+		}
+
+		var stabs []model.Stab
+		if len(*p.StabIds) > 0 {
+			if err := db.Where("id IN ?", *p.StabIds).Find(&stabs).Error; err != nil {
+				writeErrorInJson(w, http.StatusBadRequest, "Fehler bei par update von stab ids", err)
+			}
+		}
+
+		if err := db.Model(&m).Association("Stab").Replace(stabs); err != nil {
+			writeErrorInJson(w, http.StatusBadRequest, "Fehler bei par update von stab ids join", err)
+		}
+	}
+
 }
 
 func (s Server) RemoveMember(w http.ResponseWriter, r *http.Request, id Id) {
@@ -192,7 +243,6 @@ func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 	}
 
 	if err == nil {
-
 		bites, _ := json.Marshal(response)
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(bites)
@@ -205,6 +255,18 @@ func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 }
 
 func (s Server) UpdateMember(w http.ResponseWriter, r *http.Request, id Id) {
-	//TODO implement me
+	/*member := jsonToStruct[MemberUpdate](r)
+
+	if err == nil {
+		bites, _ := json.Marshal(response)
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(bites)
+	} else {
+		w.WriteHeader(404)
+		w.Header().Add("Content-Type", "application/json")
+		w.Write([]byte("no Member found"))
+	}
+	*/
+
 	panic("implement me")
 }
