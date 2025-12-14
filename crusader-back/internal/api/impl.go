@@ -3,14 +3,13 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/pulledev/crusader-frontend/crusader-back/initializers"
-	"github.com/pulledev/crusader-frontend/crusader-back/model"
+	"github.com/pulledev/crusader-frontend/crusader-back/internal/initializers"
+	"github.com/pulledev/crusader-frontend/crusader-back/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -60,8 +59,6 @@ func ptrToUint[T ~int | ~uint | ~float64](p *T) uint {
 func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 	member := jsonToStruct[MemberCreate](r)
 
-	//DB Shit:
-
 	m := model.Member{
 		DiscordId:        member.DiscordId,
 		Name:             member.Name,
@@ -76,14 +73,25 @@ func (s Server) CreateMember(w http.ResponseWriter, r *http.Request) {
 		DeletedAt:        gorm.DeletedAt{},
 	}
 
+	//Fügt member hinzu
 	result := db.Create(&m)
+
 	if result.Error != nil {
-
-		var msg = fmt.Sprint("Could not create Member: ", result.Error)
-		log.Println(msg)
-
+		log.Println(fmt.Sprint("Could not create Member: ", result.Error))
 		writeErrorInJson(w, 409, "Mitglied konnte nicht erstellt werden", result.Error)
 
+	}
+
+	stabs := make([]model.Stab, 0, len(*member.StabIds))
+	for _, id := range *member.StabIds {
+		stabs = append(stabs, model.Stab{
+			Model: gorm.Model{ID: uint(id)},
+		})
+	}
+
+	if err := db.Model(&m).Association("Stab").Append(&stabs); err != nil {
+		log.Println(fmt.Sprint("Could not create Member Stab Association: ", result.Error))
+		writeErrorInJson(w, 409, "Mitglied Stab Assoziation konnte nicht erstellt werden", result.Error)
 	}
 
 }
@@ -112,7 +120,9 @@ func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 		Where("discord_id = ?", id).
 		First(ctx)
 
-	errors.Is(err, gorm.ErrRecordNotFound)
+	if err != nil {
+		writeErrorInJson(w, 409, "Mitglied Stab Assoziation konnte nicht erstellt werden", err)
+	}
 
 	membership := MembershipType{
 		CreatedAt: member.MembershipType.CreatedAt,
@@ -120,29 +130,53 @@ func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 		Name:      member.MembershipType.Name,
 		UpdatedAt: member.MembershipType.UpdatedAt,
 	}
-	rank := Rank{
-		CreatedAt: member.Rank.CreatedAt,
-		Level:     member.Rank.Level,
-		Name:      member.Rank.Name,
-		UpdatedAt: member.Rank.UpdatedAT,
+	var rank *Rank
+	if member.Rank != nil {
+		rank = &Rank{
+			CreatedAt: member.Rank.CreatedAt,
+			Level:     member.Rank.Level,
+			Name:      member.Rank.Name,
+			UpdatedAt: member.Rank.UpdatedAT,
+		}
 	}
-	unit := Unit{
-		CreatedAt:     member.UnitRole.Unit.CreatedAt,
-		Description:   member.UnitRole.Unit.Description,
-		DiscordRoleId: member.UnitRole.Unit.DiscordRoleId,
-		Id:            int(member.UnitRole.Unit.ID),
-		Name:          member.UnitRole.Unit.Name,
-		UpdatedAt:     member.UnitRole.Unit.UpdatedAt,
+	var unit *Unit
+	if member.UnitRole != nil {
+		unit = &Unit{
+			CreatedAt:     member.UnitRole.Unit.CreatedAt,
+			Description:   member.UnitRole.Unit.Description,
+			DiscordRoleId: member.UnitRole.Unit.DiscordRoleId,
+			Id:            int(member.UnitRole.Unit.ID),
+			Name:          member.UnitRole.Unit.Name,
+			UpdatedAt:     member.UnitRole.Unit.UpdatedAt,
+		}
 	}
-	role := UnitRole{
-		CreatedAt:   member.UnitRole.CreatedAt,
-		Description: member.UnitRole.Description,
-		Id:          int(member.UnitRole.ID),
-		Name:        member.UnitRole.Name,
-		Unit:        unit,
-		UpdatedAt:   member.UnitRole.UpdatedAt,
+	var role *UnitRole
+	if member.UnitRole != nil {
+		role = &UnitRole{
+			CreatedAt:   member.UnitRole.CreatedAt,
+			Description: member.UnitRole.Description,
+			Id:          int(member.UnitRole.ID),
+			Name:        member.UnitRole.Name,
+			UpdatedAt:   member.UnitRole.UpdatedAt,
+		}
+		if unit != nil {
+			role.Unit = *unit
+		}
 	}
-	// Build the response struct with proper type conversions
+
+	var stab []Stab
+
+	for _, st := range member.Stab {
+		stab = append(stab,
+			Stab{
+				CreatedAt:   st.CreatedAt,
+				Description: st.Description,
+				Id:          int(st.ID),
+				Name:        st.Name,
+				UpdatedAt:   st.UpdatedAt,
+			})
+	}
+
 	response := Member{
 		CreatedAt:      &member.CreatedAt,
 		DiscordId:      member.DiscordId,
@@ -150,10 +184,10 @@ func (s Server) GetMember(w http.ResponseWriter, r *http.Request, id Id) {
 		MembershipType: membership,
 		Name:           member.Name,
 		Points:         member.Points,
-		Rank:           &rank,
-		Stab:           nil,
+		Rank:           rank,
+		Stab:           &stab,
 		SteamId:        member.SteamId,
-		UnitRole:       &role,
+		UnitRole:       role,
 		UpdatedAt:      &member.UpdatedAt,
 	}
 

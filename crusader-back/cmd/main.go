@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pulledev/crusader-frontend/crusader-back/api"
-	"github.com/pulledev/crusader-frontend/crusader-back/initializers"
+	"github.com/pulledev/crusader-frontend/crusader-back/internal/api"
+	"github.com/pulledev/crusader-frontend/crusader-back/internal/initializers"
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	middleware "github.com/oapi-codegen/nethttp-middleware"

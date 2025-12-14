@@ -52,7 +52,7 @@ type Member struct {
 	MembershipType   MembershipType `gorm:"foreignKey:MembershipTypeID"`
 	RankLevel        *int           `gorm:"default:null"`
 	Rank             *Rank          `gorm:"foreignKey:RankLevel"`
-	Stab             *[]Stab        `gorm:"many2many:member_stab;"`
+	Stab             []Stab         `gorm:"many2many:member_stab;"`
 	DiscordNick      string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
