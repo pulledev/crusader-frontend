@@ -20,6 +20,11 @@ var db = initializers.GetDB()
 
 type Server struct{}
 
+func (s Server) ListMembers(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func jsonToStruct[T any](r *http.Request) *T {
 	var obj T
 	decoder := json.NewDecoder(r.Body)

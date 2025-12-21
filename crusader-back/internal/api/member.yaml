@@ -10,6 +10,30 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
+  /members:
+    get:
+      tags:
+        - member
+      summary: List members
+      description: List all members
+      operationId: listMembers
+      security:
+        - BearerJwt: []
+      responses:
+        '201':
+          description: The request was successful, and a all Members are returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Member'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /member:
     post:
       tags:
